@@ -1,0 +1,73 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒精代谢时间计算</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { margin: 5px 0; width: 100%; padding: 8px; }
+        .result { margin-top: 20px; color: #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h3>酒精代谢时间计算</h3>
+    <form>
+        <label>性别：</label><br>
+        <input type="radio" name="gender" value="male" required> 男
+        <input type="radio" name="gender" value="female"> 女<br>
+        
+        <label>体重（kg）：</label>
+        <input type="number" id="weight" required min="1"><br>
+        
+        <label>年龄：</label>
+        <input type="number" id="age" required min="1"><br>
+        
+        <label>饮酒量（ml）：</label>
+        <input type="number" id="volume" required min="1"><br>
+        
+        <label>酒度数（%）：</label>
+        <input type="number" id="abv" required min="0" max="100"><br>
+        
+        <button type="button" onclick="calculate()">计算</button>
+    </form>
+    <div id="result" class="result"></div>
+    <script>
+        function calculate() {
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const age = parseInt(document.getElementById('age').value);
+            const volume = parseFloat(document.getElementById('volume').value);
+            const abv = parseFloat(document.getElementById('abv').value);
+
+            if (!gender || isNaN(weight) || isNaN(age) || isNaN(volume) || isNaN(abv)) {
+                alert("请填写所有字段！");
+                return;
+            }
+
+            // 计算纯酒精量（g）
+            const pureAlcohol = volume * (abv / 100) * 0.7894;
+
+            // 性别系数
+            const r = gender === 'male' ? 0.68 : 0.55;
+
+            // 计算BAC
+            const bac = (pureAlcohol / (weight * r)) * 100;
+
+            // 根据年龄调整代谢率
+            let metabolicRate = age >= 50 ? 14 : 15;
+
+            // 代谢时间
+            let timeHours = bac / metabolicRate;
+            timeHours = Math.max(timeHours, 0); // 避免负数
+
+            const hours = Math.floor(timeHours);
+            const minutes = Math.round((timeHours - hours) * 60);
+
+            document.getElementById('result').innerHTML = 
+                `预计代谢时间：${hours}小时${minutes}分钟<br><small>结果仅供参考，请勿酒后驾驶。</small>`;
+        }
+    </script>
+</body>
+</html>
+```
